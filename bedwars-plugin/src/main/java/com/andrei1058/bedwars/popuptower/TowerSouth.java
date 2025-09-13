@@ -1,29 +1,16 @@
 package com.andrei1058.bedwars.popuptower;
 
-import com.andrei1058.bedwars.BedWars;
 import com.andrei1058.bedwars.api.arena.team.TeamColor;
-import com.andrei1058.bedwars.configuration.Sounds;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class TowerSouth {
-    private BukkitTask task;
 
     public TowerSouth(Location loc, Block chest, TeamColor color, Player p) {
-        ItemStack itemInHand = p.getInventory().getItemInHand();
-        if (itemInHand.getAmount() > 1) {
-            itemInHand.setAmount(itemInHand.getAmount() - 1);
-        } else {
-            p.getInventory().setItemInHand(null);
-        }
-
         List<String> relloc = new ArrayList<>();
         relloc.add("1, 0, 2");
         relloc.add("2, 0, 1");
@@ -135,34 +122,6 @@ public class TowerSouth {
         relloc.add("-2, 5, 3");
         relloc.add("-2, 6, 3");
         relloc.add("-2, 7, 3");
-        int[] i = new int[]{0};
-        this.task = Bukkit.getScheduler().runTaskTimer(BedWars.plugin, () -> {
-            Sounds.playsoundArea("pop-up-tower-build", loc, 1.0F, 0.5F);
-            if (relloc.size() + 1 == i[0] + 1) {
-                this.task.cancel();
-            } else {
-                String c1 = relloc.get(i[0]);
-                if (c1.contains("ladder")) {
-                    int ldata = Integer.parseInt(c1.split("ladder")[1]);
-                    new NewPlaceBlock(chest, c1, color, p, true, ldata);
-                } else {
-                    new NewPlaceBlock(chest, c1, color, p, false, 0);
-                }
-
-                if (relloc.size() + 1 == i[0] + 2) {
-                    this.task.cancel();
-                } else {
-                    String c2 = relloc.get(i[0] + 1);
-                    if (c2.contains("ladder")) {
-                        int ldatax = Integer.parseInt(c2.split("ladder")[1]);
-                        new NewPlaceBlock(chest, c2, color, p, true, ldatax);
-                    } else {
-                        new NewPlaceBlock(chest, c2, color, p, false, 0);
-                    }
-
-                    i[0] += 2;
-                }
-            }
-        }, 0L, 1L);
+        PopupTowerBuilder.build(loc, chest, color, p, relloc);
     }
 }
