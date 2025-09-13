@@ -26,7 +26,6 @@ import com.andrei1058.bedwars.api.arena.IArena;
 import com.andrei1058.bedwars.api.arena.NextEvent;
 import com.andrei1058.bedwars.api.arena.generator.IGenerator;
 import com.andrei1058.bedwars.api.arena.team.ITeam;
-import com.andrei1058.bedwars.api.arena.team.TeamColor;
 import com.andrei1058.bedwars.api.configuration.ConfigPath;
 import com.andrei1058.bedwars.api.events.player.PlayerBedBreakEvent;
 import com.andrei1058.bedwars.api.language.Language;
@@ -37,10 +36,6 @@ import com.andrei1058.bedwars.api.util.BlastProtectionUtil;
 import com.andrei1058.bedwars.arena.Arena;
 import com.andrei1058.bedwars.configuration.Sounds;
 import com.andrei1058.bedwars.support.paper.TeleportManager;
-import com.andrei1058.bedwars.popuptower.TowerEast;
-import com.andrei1058.bedwars.popuptower.TowerNorth;
-import com.andrei1058.bedwars.popuptower.TowerSouth;
-import com.andrei1058.bedwars.popuptower.TowerWest;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -178,25 +173,7 @@ public class BreakPlace implements Listener {
             } else if (BedWars.shop.getBoolean(ConfigPath.SHOP_SPECIAL_TOWER_ENABLE)) {
                 if (e.getBlock().getType() == Material.valueOf(shop.getString(ConfigPath.SHOP_SPECIAL_TOWER_MATERIAL))) {
 
-                    e.setCancelled(true);
-                    Location loc = e.getBlock().getLocation();
-                    IArena a1 = Arena.getArenaByPlayer(p);
-                    TeamColor col = a1.getTeam(p).getColor();
-                    double rotation = (p.getLocation().getYaw() - 90.0F) % 360.0F;
-                    if (rotation < 0.0D) {
-                        rotation += 360.0D;
-                    }
-                    if (45.0D <= rotation && rotation < 135.0D) {
-                        new TowerSouth(loc, e.getBlockPlaced(), col, p);
-                    } else if (225.0D <= rotation && rotation < 315.0D) {
-                        new TowerNorth(loc, e.getBlockPlaced(), col, p);
-                    } else if (135.0D <= rotation && rotation < 225.0D) {
-                        new TowerWest(loc, e.getBlockPlaced(), col, p);
-                    } else if (0.0D <= rotation && rotation < 45.0D) {
-                        new TowerEast(loc, e.getBlockPlaced(), col, p);
-                    } else if (315.0D <= rotation && rotation < 360.0D) {
-                        new TowerEast(loc, e.getBlockPlaced(), col, p);
-                    }
+                    com.andrei1058.bedwars.popuptower.PopupTowerBuilder.handleTowerPlace(e);
                 }
             }
             return;
@@ -593,8 +570,9 @@ public class BreakPlace implements Listener {
         }
     }
 
-    private boolean isProtectedLocation(@NotNull IArena a, @NotNull Location location) {
+    public static boolean isProtectedLocation(@NotNull IArena a, @NotNull Location location) {
         try {
+            // Team-related protected areas
             for (ITeam t : a.getTeams()) {
                 if (t.getSpawn().distance(location) <= a.getConfig().getInt(ConfigPath.ARENA_SPAWN_PROTECTION)) return true;
                 if (t.getShop().distance(location) <= a.getConfig().getInt(ConfigPath.ARENA_SHOP_PROTECTION)) return true;
@@ -603,8 +581,13 @@ public class BreakPlace implements Listener {
                     if (o.getLocation().distance(location) <= a.getConfig().getInt(ConfigPath.ARENA_GENERATOR_PROTECTION)) return true;
                 }
             }
+            // Global ore generators
             for (IGenerator o : a.getOreGenerators()) {
                 if (o.getLocation().distance(location) <= a.getConfig().getInt(ConfigPath.ARENA_GENERATOR_PROTECTION)) return true;
+            }
+            // Arena regions (e.g., no-place/no-break defined areas)
+            for (Region r : a.getRegionsList()) {
+                if (r.isInRegion(location)) return true;
             }
         } catch (Exception ignored) {
         }
