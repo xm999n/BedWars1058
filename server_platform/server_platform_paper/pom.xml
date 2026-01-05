@@ -18,6 +18,7 @@
         <module>server_platform_paper_v1_21_R1</module>
         <module>server_platform_paper_v1_21_R2</module>
         <module>server_platform_paper_v1_21_R3</module>
+        <module>server_platform_paper_v1_21_R4</module>
     </modules>
 
     <properties>

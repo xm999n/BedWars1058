@@ -20,6 +20,7 @@ public class PaperLoader implements IPlatformLoader {
         versionMappings.put("1.21.1", "v1_21_R1");
         versionMappings.put("1.21.3", "v1_21_R2");
         versionMappings.put("1.21.4", "v1_21_R3");
+        versionMappings.put("1.21.11", "v1_21_R4");
 
         return versionMappings;
     }

@@ -376,6 +376,12 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>com.andrei1058.bedwars.platform.paper</groupId>
+            <artifactId>server_platform_paper_v1_21_R4</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>com.andrei1058.bedwars.platform.spigot</groupId>
             <artifactId>server_platform_spigot_common</artifactId>
             <version>${project.version}</version>
@@ -384,6 +390,12 @@
         <dependency>
             <groupId>com.andrei1058.bedwars.platform.spigot</groupId>
             <artifactId>server_platform_spigot_v1_21_R1</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.andrei1058.bedwars.platform.spigot</groupId>
+            <artifactId>server_platform_spigot_v1_21_R4</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>

@@ -17,6 +17,7 @@
         <module>server_platform_spigot_common</module>
         <module>server_platform_spigot_v1_21_R1</module>
         <module>server_platform_spigot_v1_21_R2</module>
+        <module>server_platform_spigot_v1_21_R4</module>
     </modules>
 
     <properties>
