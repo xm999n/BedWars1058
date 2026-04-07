@@ -9,14 +9,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Checkout SidebarLib
+        uses: actions/checkout@v4
+        with:
+          repository: andrei1058/SidebarLib
+          path: sidebar-lib
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
+      - name: Build SidebarLib locally
+        working-directory: sidebar-lib
+        run: |
+          SIDEBAR_VERSION="$(mvn -q -DforceStdout help:evaluate -Dexpression=project.version | tail -n 1)"
+          if [ -z "$SIDEBAR_VERSION" ]; then
+            SIDEBAR_VERSION="24.2"
+          fi
+          echo "SIDEBAR_VERSION=$SIDEBAR_VERSION" >> "$GITHUB_ENV"
+          mvn -B -DskipTests -Dmaven.javadoc.skip=true install
       - name: Build snapshot with Maven
-        run: mvn -B -DskipTests clean package
+        run: mvn -B -DskipTests -Dsidebar.version="${SIDEBAR_VERSION}" clean package
 
       - name: Upload build artifact
         if: ${{ always() }}
