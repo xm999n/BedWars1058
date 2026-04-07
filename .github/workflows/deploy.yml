@@ -39,6 +39,14 @@ jobs:
           curl -X PUT https://api.andrei1058.dev/v1/resources/1/versioning/commit -H "Accept: application/json" -H "Authorization: Bearer ${{ secrets.ANDEV_API_TOKEN }}" -H "Content-Type: application/json" --data '{"confirmation": true}' >> version.json
           echo "UPDATE_VERSION=$UPDATE_VERSION" >> $GITHUB_ENV
 
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bedwars-plugin-${{ env.UPDATE_VERSION }}
+          path: bedwars-plugin/target/*.jar
+          if-no-files-found: error
+          retention-days: 14
+
       - name: Create Tag
         uses: softprops/action-gh-release@v1
         with:

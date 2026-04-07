@@ -33,3 +33,11 @@ jobs:
           mvn versions:update-child-modules
           mvn clean install -s ci_settings.xml
           echo "UPDATE_VERSION=$UPDATE_VERSION" >> $GITHUB_ENV
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bedwars-plugin-${{ env.UPDATE_VERSION }}-SNAPSHOT
+          path: bedwars-plugin/target/*.jar
+          if-no-files-found: error
+          retention-days: 14
