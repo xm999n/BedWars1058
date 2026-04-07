@@ -23,6 +23,7 @@ package com.andrei1058.bedwars.listeners;
 import com.andrei1058.bedwars.BedWars;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
@@ -32,30 +33,34 @@ import org.bukkit.event.world.ChunkLoadEvent;
 public class ChunkLoad implements Listener {
 
     @EventHandler
-    public void onChunkLoadEvent(ChunkLoadEvent e){
+    public void onChunkLoadEvent(ChunkLoadEvent e) {
         if (e == null) return;
         if (e.getChunk() == null) return;
-        if (e.getChunk().getEntities() == null) return;
-        Bukkit.getScheduler().runTaskAsynchronously(BedWars.plugin, ()-> {
-            for (Entity entity : e.getChunk().getEntities()){
-                if (entity instanceof ArmorStand){
-                    if (entity.hasMetadata("bw1058-setup")){
-                        Bukkit.getScheduler().runTask(BedWars.plugin, entity::remove);
-                        continue;
-                    }
-                    if (!((ArmorStand)entity).isVisible()){
-                        if (((ArmorStand)entity).isMarker()){
-                            //if (!entity.hasGravity()){
-                            if (entity.isCustomNameVisible()){
-                                if (ChatColor.stripColor(entity.getCustomName()).contains(" SET") || ChatColor.stripColor(entity.getCustomName()).contains(" set")){
-                                    Bukkit.getScheduler().runTask(BedWars.plugin, entity::remove);
-                                }
-                            }
-                            //}
-                        }
+
+        Chunk chunk = e.getChunk();
+        if (!Bukkit.isPrimaryThread()) {
+            Bukkit.getScheduler().runTask(BedWars.plugin, () -> processChunk(chunk));
+            return;
+        }
+
+        processChunk(chunk);
+    }
+
+    private void processChunk(Chunk chunk) {
+        for (Entity entity : chunk.getEntities()) {
+            if (entity instanceof ArmorStand) {
+                ArmorStand armorStand = (ArmorStand) entity;
+                if (entity.hasMetadata("bw1058-setup")) {
+                    entity.remove();
+                    continue;
+                }
+                if (!armorStand.isVisible() && armorStand.isMarker() && entity.isCustomNameVisible()) {
+                    String name = ChatColor.stripColor(entity.getCustomName());
+                    if (name != null && (name.contains(" SET") || name.contains(" set"))) {
+                        entity.remove();
                     }
                 }
             }
-        });
+        }
     }
 }
